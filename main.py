@@ -22,6 +22,7 @@ async def start_command(message: Message, bot: Bot):
     return await message.reply("Да!")'''
 
 async def main():
+    print(sys.argv)
     bot = Bot(sys.argv[1])
     dp.include_routers(start.router, channels.router)
     await bot.delete_webhook(drop_pending_updates=True)
