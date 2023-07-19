@@ -19,6 +19,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install pylint
         pip install aiogram==3.0.0b7
+        pip install dotenv
     - name: Analysing the code with pylint
       run: |
         python main.py
