@@ -1,16 +1,15 @@
-from os import environ
-
-from aiogram import Router, Bot
+from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
-from aiohttp import ClientSession
 
-from keyboards.reg_kbs import name_kb, city_kb
-from keyboards.menu_kb import menu_kb
+'''from keyboards.reg_kbs import name_kb, city_kb
+from keyboards.menu_kb import menu_kb'''
 from states import UserStates
 from database import create_user, get_user
-from dotenv import load_dotenv
+from keyboards.channels import channels_button, commands_button
+import data
+print(data.a)
 
 router = Router()
 
@@ -18,71 +17,24 @@ router = Router()
 @router.message(Command("start"))
 async def start_command(message: Message, state: FSMContext):
     user = get_user(message.from_user.id)
+    print(user)
     if user:
-        return await message.answer("Добро пожаловать!",
-                                    reply_markup=menu_kb())
-    await message.answer("Добро пожаловать! Введите Ваше имя",
-                         reply_markup=name_kb(message.from_user.first_name))
-    await state.set_state(UserStates.ENTER_NAME)
+        await state.clear()
+        return await message.answer(data.m['cancel'])
+    await message.answer(data.m['help'], reply_markup=channels_button())
+    await message.answer('Команды бота:', reply_markup=commands_button())
+    create_user(message.from_user.id, message.from_user.first_name, data="")
 
+@router.message(Command("help"))
+async def help_command(message: Message):
+    await message.answer(data.m['help'], reply_markup=channels_button())
+    await message.answer('Команды бота:', reply_markup=commands_button())
 
-@router.message(UserStates.ENTER_NAME)
-async def enter_age(message: Message, state: FSMContext):
-    await state.update_data(name=message.text)
-    await message.answer("Введите Ваш возраст!")
-    await state.set_state(UserStates.ENTER_AGE)
+@router.message(Command("commands"))
+async def commands_command(message: Message):
+    await message.answer('Команды бота:', reply_markup=commands_button())
 
-
-@router.message(UserStates.ENTER_AGE, lambda m: m.text.isdigit())
-async def enter_city(message: Message, state: FSMContext):
-    await state.update_data(age=int(message.text))
-    await message.answer("Отправьте свое местоположение для определения города",
-                         reply_markup=city_kb())
-    await state.set_state(UserStates.ENTER_CITY)
-
-
-@router.message(UserStates.ENTER_CITY)
-async def enter_city(message: Message, state: FSMContext):
-    await state.update_data(city=message.text)
-    await state.set_state(UserStates.ENTER_INFO)
-    await message.answer("Расскажи что-нибудь о себе!")
-
-
-@router.message(UserStates.ENTER_INFO)
-async def upload_photo(message: Message, state: FSMContext):
-    await message.answer("Пожалуйста, пришли свою фотографию")
-    await state.update_data(about=message.text)
-    await state.set_state(UserStates.UPLOAD_PHOTO)
-
-
-@router.message(UserStates.UPLOAD_PHOTO, lambda m: True if m.photo else False)
-async def accept_data(message: Message, state: FSMContext, bot: Bot):
-    data = await state.get_data()
-    await state.clear()
-    load_dotenv()
-    file_id = message.photo[-1].file_id
-    file = await bot.get_file(file_id)
-    await bot.download_file(file.file_path, "image.jpg")
-    img_data = b""
-    with open("image.jpg", "rb") as file:
-        img_data += file.read()
-    async with ClientSession(headers={
-        "Content-Type": "image/jpeg"
-    }) as session:
-        response = await session.post(
-            url=f"https://www.filestackapi.com/api/store/S3?key={environ.get('FILESTACK_API_KEY')}",
-            data=open("image.jpg", "rb")
-        )
-        rdata = await response.json()
-        await session.close()
-    image_link = rdata['url']
-    create_user(
-        user_id=message.from_user.id,
-        name=data['name'],
-        about=data['about'],
-        photo_link=image_link,
-        age=data['age'],
-        city=data['city']
-    )
-    await message.answer("Успешно! Анкета добавлена в поиск!", reply_markup=menu_kb())
-
+'''@router.message()#lambda m: UserStates.UPDATE_DATA==0
+async def commands_command(message: Message, state: FSMContext):
+    print(UserStates.UPDATE_DATA.__hash__)
+    if state.get_state:await message.answer(data.m['error_c']+str(state.get_state))'''
