@@ -7,6 +7,8 @@ from aiogram.filters import Command
 from aiogram.types import Message
 from dotenv import load_dotenv
 
+import sys
+
 from handlers import start, channels
 
 dp = Dispatcher()
@@ -20,7 +22,7 @@ async def start_command(message: Message, bot: Bot):
     return await message.reply("Да!")'''
 
 async def main():
-    bot = Bot(environ.get("TOKEN"))
+    bot = Bot(sys.argv[1])
     dp.include_routers(start.router, channels.router)
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
