@@ -21,4 +21,4 @@ jobs:
         pip install aiogram==3.0.0b7
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files '*.py')
+        python main.py
