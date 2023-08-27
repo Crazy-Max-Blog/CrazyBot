@@ -5,7 +5,7 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 0
+    timeout-minutes: 518400000000
     strategy:
       matrix:
         python-version: ["3.9"]
