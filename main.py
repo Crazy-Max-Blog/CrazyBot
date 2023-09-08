@@ -30,10 +30,11 @@ async def main():
     await bot.send_message(id = 5998717080, text="Test text from python!")
 
 
-if __name__ == '__main__':
-    basicConfig(level=INFO)
-    loop = get_event_loop()
-    loop.run_until_complete(main())
+while True:
+    if __name__ == '__main__':
+        basicConfig(level=INFO)
+        loop = get_event_loop()
+        loop.run_until_complete(main())
 
 
 
