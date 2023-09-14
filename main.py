@@ -31,12 +31,12 @@ async def main():
 
 
 #while True:
-    if __name__ == '__main__':
-        basicConfig(level=INFO)
-        loop = get_event_loop()
-        loop.run_until_complete(main())
+if __name__ == '__main__':
+    basicConfig(level=INFO)
+    loop = get_event_loop()
+    loop.run_until_complete(main())
 
 
 
-from .. import text
-print(text.a)
+#from .. import text
+#print(text.a)
